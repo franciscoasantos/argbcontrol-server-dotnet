@@ -3,7 +3,7 @@ using DataContracts;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
-namespace api.Controllers;
+namespace API.Controllers;
 
 [ApiController]
 public class WebSocketController : ControllerBase
