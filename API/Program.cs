@@ -12,8 +12,6 @@ var app = builder.Build();
 
 app.UseWebSockets();
 
-app.UseHttpsRedirection();
-
 app.UseAuthorization();
 
 app.MapControllers();

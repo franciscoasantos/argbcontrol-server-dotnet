@@ -18,7 +18,10 @@ public class WebSocketController : ControllerBase
     }
 
     [HttpGet("/")]
-    public async Task Get(CancellationToken cancellationToken)
+    public async Task WebSocketEntry([FromQuery] Guid socketId,
+                                     [FromQuery] Guid clientId = default,
+                                     [FromQuery] bool isReceiver = false,
+                                     CancellationToken cancellationToken = default)
     {
         try
         {
@@ -28,12 +31,9 @@ public class WebSocketController : ControllerBase
             }
             else
             {
-                var socketId = Guid.Parse(HttpContext.Request.Query["socketId"]);
-                var isReceiver = HttpContext.Request.Query["isReceiver"].Equals("1");
-
                 var wsContext = await HttpContext.WebSockets.AcceptWebSocketAsync(subProtocol: null);
 
-                var webSocketClient = new WebSocketClient(wsContext, socketId, isReceiver);
+                var webSocketClient = new WebSocketClient(wsContext, socketId, isReceiver, clientId);
 
                 await Task.Run(()
                     => ApplicationServices.StartProcessingAsync(webSocketClient, cancellationToken), cancellationToken)
