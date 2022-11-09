@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API", "src\API\API.csproj", "{A89239C9-9732-4FB4-B011-36BB584C340C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API", "src\API\API.csproj", "{A89239C9-9732-4FB4-B011-36BB584C340C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "src\Application\Application.csproj", "{C864412B-5404-4E60-AFCA-380D433A6FA4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Application", "src\Application\Application.csproj", "{C864412B-5404-4E60-AFCA-380D433A6FA4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataContracts", "src\DataContracts\DataContracts.csproj", "{CF62FC6F-B1C8-4F2A-8CB8-92D21AF53CFF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataContracts", "src\DataContracts\DataContracts.csproj", "{CF62FC6F-B1C8-4F2A-8CB8-92D21AF53CFF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6ECBC491-2616-4C6D-8D37-F1726EF0FD86}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,6 +32,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A89239C9-9732-4FB4-B011-36BB584C340C} = {6ECBC491-2616-4C6D-8D37-F1726EF0FD86}
+		{C864412B-5404-4E60-AFCA-380D433A6FA4} = {6ECBC491-2616-4C6D-8D37-F1726EF0FD86}
+		{CF62FC6F-B1C8-4F2A-8CB8-92D21AF53CFF} = {6ECBC491-2616-4C6D-8D37-F1726EF0FD86}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {29A6292C-388D-4EAD-AF4C-52E2D7C3C0EF}
