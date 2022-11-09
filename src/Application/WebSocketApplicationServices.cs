@@ -22,79 +22,77 @@ public class WebSocketApplicationServices : IWebSocketApplicationServices
         await StartProcessingLoopAsync(webSocketClient, cancellationToken);
     }
 
-    private static async Task StartProcessingLoopAsync(WebSocketClient currentClient, CancellationToken cancellationToken)
+    private static async Task StartProcessingLoopAsync(WebSocketClient client, CancellationToken cancellationToken)
     {
-        var socketClient = currentClient.Socket;
-
         try
         {
             var buffer = WebSocket.CreateServerBuffer(4096);
 
-            var currentSocket = Sockets.FirstOrDefault(w => w.SocketId == currentClient.SocketId);
-            var receiverClients = currentSocket!.Clients.Where(w => w.IsReceiver);
+            var clientSocket = Sockets.FirstOrDefault(w => w.SocketId == client.SocketId);
+            var receiverClients = clientSocket!.Clients.Where(w => w.IsReceiver);
 
-            await currentClient.Socket.SendAsync(currentSocket.Data,
-                                                 WebSocketMessageType.Text,
-                                                 true,
-                                                 cancellationToken);
+            await client.Socket.SendAsync(clientSocket.Data,
+                                          WebSocketMessageType.Text,
+                                          true,
+                                          cancellationToken);
 
-            while (socketClient.State != WebSocketState.Closed && socketClient.State != WebSocketState.Aborted && !cancellationToken.IsCancellationRequested)
+            while (client.Socket.State != WebSocketState.Closed && client.Socket.State != WebSocketState.Aborted && !cancellationToken.IsCancellationRequested)
             {
-                var receiveResult = await currentClient.Socket.ReceiveAsync(new ArraySegment<byte>(buffer.Array!), cancellationToken);
+                cancellationToken.ThrowIfCancellationRequested();
 
-                if (currentClient.Socket.State == WebSocketState.CloseReceived && receiveResult.MessageType == WebSocketMessageType.Close)
+                var receiveResult = await client.Socket.ReceiveAsync(new ArraySegment<byte>(buffer.Array!), cancellationToken);
+
+                if (client.Socket.State == WebSocketState.CloseReceived && receiveResult.MessageType == WebSocketMessageType.Close)
                 {
-                    Console.WriteLine($"Socket {currentClient.SocketId}: Acknowledging Close frame received from client");
-                    await socketClient.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Acknowledge Close frame", cancellationToken);
+                    Console.WriteLine($"Socket {client.SocketId}: Acknowledging Close frame received from client");
+                    await client.Socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Acknowledge Close frame", cancellationToken);
+                    break;
                 }
 
-                if (currentClient.Socket.State == WebSocketState.Open)
+                Console.WriteLine($"Socket {client.SocketId}: Received {receiveResult.MessageType} frame ({receiveResult.Count} bytes).");
+
+                clientSocket.Data = ParseMessage(new ArraySegment<byte>(buffer.Array!, 0, receiveResult.Count));
+
+                if (receiverClients == null || !receiverClients.Any())
                 {
-                    currentSocket.Data = ParseMessage(new ArraySegment<byte>(buffer.Array!, 0, receiveResult.Count));
+                    Console.WriteLine($"Socket {client.SocketId}: Receiver client not found.");
+                    continue;
+                }
 
-                    Console.WriteLine($"Socket {currentClient.SocketId}: Received {receiveResult.MessageType} frame ({receiveResult.Count} bytes).");
-
-                    if (receiverClients == null || !receiverClients.Any())
-                    {
-                        Console.WriteLine($"Socket {currentClient.SocketId}: Receiver client not found.");
-                        continue;
-                    }
-
-                    foreach (var receiverClient in receiverClients)
-                    {
-                        await receiverClient.Socket.SendAsync(currentSocket.Data,
-                                                              WebSocketMessageType.Text,
-                                                              true,
-                                                              cancellationToken);
-                    }
+                foreach (var receiverClient in receiverClients)
+                {
+                    await receiverClient.Socket.SendAsync(clientSocket.Data,
+                                                          WebSocketMessageType.Text,
+                                                          true,
+                                                          cancellationToken);
                 }
             }
         }
         catch (OperationCanceledException)
         {
-            // normal upon task/token cancellation, disregard
+            Console.WriteLine($"Socket {client.SocketId}: Operation cancelled!");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Socket {currentClient.SocketId}: {ex.Message}");
+            Console.WriteLine($"Socket {client.SocketId}: {ex.Message}");
         }
         finally
         {
-            Console.WriteLine($"Socket {currentClient.SocketId}: Ended processing loop in state {socketClient.State} for client: {currentClient.ClientId}");
+            Console.WriteLine($"Socket {client.SocketId}: Ended processing loop in state {client.Socket.State} for client: {client.ClientId}");
 
-            if (currentClient.Socket.State != WebSocketState.Closed)
+            if (client.Socket.State != WebSocketState.Closed)
             {
-                currentClient.Socket.Abort();
+                client.Socket.Abort();
             }
 
-            var sockets = Sockets.FirstOrDefault(w => w.SocketId == currentClient.SocketId);
+            var sockets = Sockets.FirstOrDefault(w => w.SocketId == client.SocketId);
 
             if (sockets != null)
             {
-                sockets.Clients.RemoveAll(s => s.ClientId == currentClient.ClientId);
+                sockets.Clients.RemoveAll(s => s.ClientId == client.ClientId);
             }
 
-            socketClient.Dispose();
+            client.Socket.Dispose();
         }
     }
 
