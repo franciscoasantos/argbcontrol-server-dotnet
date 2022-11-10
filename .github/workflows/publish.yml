@@ -18,12 +18,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up .NET
+      - name: ⚙️ Set up .NET
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
       
-      - name: Set up dependency caching for faster builds
+      - name: 📦 Set up dependency caching for faster builds
         uses: actions/cache@v3
         with:
           path: ~/.nuget/packages
@@ -31,13 +31,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-
 
-      - name: Build with dotnet
+      - name: 🛠️ Build with dotnet
         run: dotnet build --configuration Release
 
-      - name: dotnet publish
+      - name: ⚡ dotnet publish
         run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
 
-      - name: Upload artifact for deployment job
+      - name: ⬆️ Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
           name: .net-app
@@ -53,7 +53,7 @@ jobs:
       url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
 
     steps:
-      - name: Download artifact from build job
+      - name: ⬇️ Download artifact from build job
         uses: actions/download-artifact@v3
         with:
           name: .net-app
@@ -75,6 +75,5 @@ jobs:
           port: 22
           script: |
             cd /home/www/argbcontrol-server-dotnet/
-            npm install
             screen -X -S argbcontrol-server-dotnet kill
-            screen -dmS argbcontrol-server-dotnet dotnet API
+            screen -dmS argbcontrol-server-dotnet dotnet API.dll --urls=http://144.217.94.131:5000/
