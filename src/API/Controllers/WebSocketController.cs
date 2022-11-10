@@ -19,7 +19,6 @@ public class WebSocketController : ControllerBase
 
     [HttpGet("/")]
     public async Task WebSocketEntry([FromQuery] Guid socketId,
-                                     [FromQuery] Guid clientId = default,
                                      [FromQuery] bool isReceiver = false,
                                      CancellationToken cancellationToken = default)
     {
@@ -33,7 +32,7 @@ public class WebSocketController : ControllerBase
             {
                 var wsContext = await HttpContext.WebSockets.AcceptWebSocketAsync(subProtocol: null);
 
-                var webSocketClient = new WebSocketClient(wsContext, socketId, isReceiver, clientId);
+                var webSocketClient = new WebSocketClient(wsContext, socketId, isReceiver);
 
                 await Task.Run(()
                     => ApplicationServices.StartProcessingAsync(webSocketClient, cancellationToken), cancellationToken)

@@ -9,9 +9,9 @@ public class WebSocketClient
     public bool IsReceiver { get; set; }
     public WebSocket Socket { get; private set; }
 
-    public WebSocketClient(WebSocket socket, Guid socketId, bool isReceiver, Guid? clientId = null)
+    public WebSocketClient(WebSocket socket, Guid socketId, bool isReceiver)
     {
-        ClientId = clientId ?? Guid.NewGuid();
+        ClientId = Guid.NewGuid();
         SocketId = socketId;
         IsReceiver = isReceiver;
         Socket = socket;

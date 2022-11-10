@@ -13,7 +13,7 @@ public class WebSocketApplicationServices : IWebSocketApplicationServices
 
     public async Task StartProcessingAsync(WebSocketClient webSocketClient, CancellationToken cancellationToken)
     {
-        Console.WriteLine($"Socket {webSocketClient.SocketId}: New connection.");
+        Console.WriteLine($"Socket {webSocketClient.SocketId}: New connection (ID: {webSocketClient.ClientId}).");
 
         Sockets.AddOrUpdate(new WebSocketInstance(webSocketClient.SocketId,
                                                   Encoding.ASCII.GetBytes("200010"),
