@@ -44,18 +44,18 @@ public class WebSocketApplicationServices : IWebSocketApplicationServices
 
                 if (client.Socket.State == WebSocketState.CloseReceived && receiveResult.MessageType == WebSocketMessageType.Close)
                 {
-                    Console.WriteLine($"Socket {client.SocketId}: Acknowledging Close frame received from client");
+                    Console.WriteLine($"Socket {client.SocketId}: Acknowledging Close frame received from client {client.ClientId}");
                     await client.Socket.CloseOutputAsync(WebSocketCloseStatus.NormalClosure, "Acknowledge Close frame", cancellationToken);
                     break;
                 }
 
-                Console.WriteLine($"Socket {client.SocketId}: Received {receiveResult.MessageType} frame ({receiveResult.Count} bytes).");
+                Console.WriteLine($"Socket {client.SocketId}: Received {receiveResult.MessageType} frame from {client.ClientId} ({receiveResult.Count} bytes).");
 
                 clientSocket.Data = ParseMessage(new ArraySegment<byte>(buffer.Array!, 0, receiveResult.Count));
 
                 if (receiverClients == null || !receiverClients.Any())
                 {
-                    Console.WriteLine($"Socket {client.SocketId}: Receiver client not found.");
+                    Console.WriteLine($"Socket {client.SocketId}: Receiver clients not found.");
                     continue;
                 }
 
@@ -78,7 +78,7 @@ public class WebSocketApplicationServices : IWebSocketApplicationServices
         }
         finally
         {
-            Console.WriteLine($"Socket {client.SocketId}: Ended processing loop in state {client.Socket.State} for client: {client.ClientId}");
+            Console.WriteLine($"Socket {client.SocketId}: Ended processing loop in state {client.Socket.State} for client {client.ClientId}");
 
             if (client.Socket.State != WebSocketState.Closed)
             {
