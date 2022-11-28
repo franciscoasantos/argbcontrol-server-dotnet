@@ -4,8 +4,10 @@ using Application.Contracts;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddSingleton<IWebSocketApplicationServices, WebSocketApplicationServices>();
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddSingleton<IWebSocketService, WebSocketService>();
 
+builder.Services.AddMemoryCache();
 builder.Services.AddControllers();
 
 var app = builder.Build();

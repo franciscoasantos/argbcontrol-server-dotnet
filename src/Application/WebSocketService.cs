@@ -7,7 +7,7 @@ using System.Text.Json;
 
 namespace Application;
 
-public class WebSocketApplicationServices : IWebSocketApplicationServices
+public class WebSocketService : IWebSocketService
 {
     private static readonly List<WebSocketInstance> Sockets = new();
 
