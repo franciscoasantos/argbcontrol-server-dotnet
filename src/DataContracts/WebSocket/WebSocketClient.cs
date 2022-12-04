@@ -4,14 +4,14 @@ namespace DataContracts;
 
 public class WebSocketClient
 {
-    public Guid ClientId { get; private set; }
-    public Guid SocketId { get; private set; }
+    public long ClientId { get; private set; }
+    public long SocketId { get; private set; }
     public bool IsReceiver { get; set; }
     public WebSocket Socket { get; private set; }
 
-    public WebSocketClient(WebSocket socket, Guid socketId, bool isReceiver)
+    public WebSocketClient(WebSocket socket, long socketId, long clientId, bool isReceiver)
     {
-        ClientId = Guid.NewGuid();
+        ClientId = clientId;
         SocketId = socketId;
         IsReceiver = isReceiver;
         Socket = socket;

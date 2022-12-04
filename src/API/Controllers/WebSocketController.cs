@@ -1,4 +1,5 @@
 using Application.Contracts;
+using Application.Exceptions;
 using DataContracts;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -20,10 +21,7 @@ public class WebSocketController : ControllerBase
     }
 
     [HttpGet("/")]
-    public async Task WebSocketEntry([FromQuery] Guid socketId,
-                                     [FromQuery] string token,
-                                     [FromQuery] bool isReceiver = false,
-                                     CancellationToken cancellationToken = default)
+    public async Task WebSocketEntry([FromQuery] string token, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -39,13 +37,22 @@ public class WebSocketController : ControllerBase
                 return;
             }
 
+            var socketId = AuthenticationService.GetSocketId(token);
+            var clientId = AuthenticationService.GetClientId(token);
+            var isReceiver = AuthenticationService.IsReceiver(token);
+
             var wsContext = await HttpContext.WebSockets.AcceptWebSocketAsync(subProtocol: null);
 
-            var webSocketClient = new WebSocketClient(wsContext, socketId, isReceiver);
+            var webSocketClient = new WebSocketClient(wsContext, socketId, clientId, isReceiver);
 
             await Task.Run(()
                 => ApplicationServices.StartProcessingAsync(webSocketClient, cancellationToken), cancellationToken)
             .ConfigureAwait(true);
+        }
+        catch (InvalidTokenException ex)
+        {
+            HttpContext.Response.StatusCode = 400;
+            _logger.LogError(ex.Message);
         }
         catch (Exception ex)
         {

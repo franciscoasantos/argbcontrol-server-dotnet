@@ -1,4 +1,5 @@
 ﻿using Application.Contracts;
+using Application.Exceptions;
 using DataContracts;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -15,32 +16,70 @@ public class AuthenticationService : IAuthenticationService
 
     public async Task<string> Authenticate(string secret)
     {
+        //TODO: Secret validation logic
         if (!secret.Equals("9a02d1e835264f6fa7f3d0ede49cea5a"))
         {
             return null!;
         }
 
-        var authToken = Guid.NewGuid();
+        var token = Guid.NewGuid().ToString();
 
-        var authInfo = Cache.GetOrCreate(authToken, item =>
+        var authInfo = Cache.GetOrCreate(token, item =>
         {
+            //TODO: Client properties recovery logic
+            long socketId = 0;
+            long clientId = 0;
+            bool isReceiver = true;
+
             item.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(1);
-            return new WebSocketAuthInfo(authToken);
+            return new WebSocketAuthInfo(socketId, clientId, isReceiver, token);
         });
 
-        return authInfo!.AuthToken.ToString();
-
+        return authInfo!.Token;
     }
 
     public bool IsValidToken(string token)
     {
         var isParsed = Guid.TryParse(token, out Guid resultGuid);
 
-        if (isParsed && Cache.TryGetValue(resultGuid, out WebSocketAuthInfo? resultCache))
+        if (isParsed && Cache.TryGetValue(resultGuid.ToString(), out WebSocketAuthInfo? resultCache))
         {
-            return resultCache?.AuthToken == resultGuid;
+            return resultCache?.Token == resultGuid.ToString();
         }
 
         return false;
+    }
+
+    public long GetSocketId(string token)
+    {
+        if (!IsValidToken(token))
+        {
+            throw new InvalidTokenException("Invalid token!");
+        }
+
+        Cache.TryGetValue(token, out WebSocketAuthInfo? resultCache);
+        return resultCache!.SocketId;
+    }
+
+    public long GetClientId(string token)
+    {
+        if (!IsValidToken(token))
+        {
+            throw new InvalidTokenException("Invalid token!");
+        }
+
+        Cache.TryGetValue(token, out WebSocketAuthInfo? resultCache);
+        return resultCache!.ClientId;
+    }
+
+    public bool IsReceiver(string token)
+    {
+        if (!IsValidToken(token))
+        {
+            throw new InvalidTokenException("Invalid token!");
+        }
+
+        Cache.TryGetValue(token, out WebSocketAuthInfo? resultCache);
+        return resultCache!.IsReceiver;
     }
 }
