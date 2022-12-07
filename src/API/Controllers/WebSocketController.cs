@@ -34,13 +34,14 @@ public class WebSocketController : ControllerBase
                 return Unauthorized();
             }
 
-            var socketId = AuthenticationService.GetSocketId(token);
-            var clientId = AuthenticationService.GetClientId(token);
-            var isReceiver = AuthenticationService.IsReceiver(token);
+            var authInfo = AuthenticationService.GetAuthInfoFromCache(token);
 
             var wsContext = await HttpContext.WebSockets.AcceptWebSocketAsync(subProtocol: null);
 
-            var webSocketClient = new WebSocketClient(wsContext, socketId, clientId, isReceiver);
+            var webSocketClient = new WebSocketClient(wsContext,
+                                                      authInfo.SocketId,
+                                                      authInfo.ClientId,
+                                                      authInfo.IsReceiver);
 
             await Task.Run(()
                 => ApplicationServices.StartProcessingAsync(webSocketClient, cancellationToken), cancellationToken)

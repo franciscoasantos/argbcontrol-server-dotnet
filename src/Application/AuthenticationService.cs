@@ -50,7 +50,7 @@ public class AuthenticationService : IAuthenticationService
         return false;
     }
 
-    public long GetSocketId(string token)
+    public WebSocketAuthInfo GetAuthInfoFromCache(string token)
     {
         if (!IsValidToken(token))
         {
@@ -58,28 +58,7 @@ public class AuthenticationService : IAuthenticationService
         }
 
         Cache.TryGetValue(token, out WebSocketAuthInfo? resultCache);
-        return resultCache!.SocketId;
-    }
 
-    public long GetClientId(string token)
-    {
-        if (!IsValidToken(token))
-        {
-            throw new InvalidTokenException("Invalid token!");
-        }
-
-        Cache.TryGetValue(token, out WebSocketAuthInfo? resultCache);
-        return resultCache!.ClientId;
-    }
-
-    public bool IsReceiver(string token)
-    {
-        if (!IsValidToken(token))
-        {
-            throw new InvalidTokenException("Invalid token!");
-        }
-
-        Cache.TryGetValue(token, out WebSocketAuthInfo? resultCache);
-        return resultCache!.IsReceiver;
+        return resultCache!;
     }
 }
