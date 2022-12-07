@@ -41,7 +41,6 @@ public class WebSocketController : ControllerBase
         }
         catch (Exception ex)
         {
-            HttpContext.Response.StatusCode = 500;
             _logger.LogError(ex.Message);
         }
 
