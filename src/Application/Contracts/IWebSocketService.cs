@@ -1,4 +1,4 @@
-﻿using DataContracts;
+﻿using Application.DataContracts;
 
 namespace Application.Contracts;
 

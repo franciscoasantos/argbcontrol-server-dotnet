@@ -1,10 +1,9 @@
-﻿using DataContracts;
+﻿using Application.DataContracts;
 
 namespace Application.Contracts;
 
 public interface IAuthenticationService
 {
-    Task<string> Authenticate(string secret);
-    bool IsValidToken(string token);
-    WebSocketAuthInfo GetAuthInfoFromCache(string token);
+    Task<WebSocketAuthInfo> Authenticate(string id, string secret);
+    bool TryGetAuthInfoFromCache(string id, out WebSocketAuthInfo authInfo);
 }
