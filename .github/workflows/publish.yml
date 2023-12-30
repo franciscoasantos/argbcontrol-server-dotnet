@@ -82,4 +82,4 @@ jobs:
           script: |
             cd /home/www/argbcontrol-server-dotnet/
             screen -X -S argbcontrol-server-dotnet kill
-            screen -dmS argbcontrol-server-dotnet dotnet API.dll --urls=http://144.217.94.131:5000/
+            screen -dmS argbcontrol-server-dotnet dotnet Api.dll --urls=http://144.217.94.131:5000/
