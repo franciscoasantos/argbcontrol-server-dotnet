@@ -1,27 +1,26 @@
 ﻿using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
-namespace DataContracts;
+namespace Application.DataContracts;
 
-[DataContract]
 public class Message
 {
     [DataMember]
     [JsonPropertyName("M")]
     public string Mode { get; set; }
-    
+
     [DataMember]
     [JsonPropertyName("R")]
     public string? Red { get; set; }
-    
+
     [DataMember]
     [JsonPropertyName("G")]
     public string? Green { get; set; }
-    
+
     [DataMember]
     [JsonPropertyName("B")]
     public string? Blue { get; set; }
-    
+
     [DataMember]
     [JsonPropertyName("A")]
     public string? Arguments { get; set; }

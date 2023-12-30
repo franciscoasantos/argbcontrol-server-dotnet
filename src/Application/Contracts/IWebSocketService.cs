@@ -1,8 +1,8 @@
-﻿using DataContracts;
+﻿using Application.DataContracts;
 
 namespace Application.Contracts;
 
-public interface IWebSocketApplicationServices
+public interface IWebSocketService
 {
     Task StartProcessingAsync(WebSocketClient webSocketClient, CancellationToken cancellationToken);
 }
