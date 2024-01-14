@@ -16,7 +16,7 @@ public class WebSocketService : IWebSocketService
         Console.WriteLine($"Socket {webSocketClient.Socket.Name}: New connection ({webSocketClient.Client.Name}).");
 
         Sockets.AddOrUpdate(new WebSocketInstance(webSocketClient.Socket.Id!,
-                                                  Encoding.ASCII.GetBytes("200010"),
+                                                  Encoding.ASCII.GetBytes("0000000000255"),
                                                   webSocketClient));
 
         await StartProcessingLoopAsync(webSocketClient, cancellationToken);
@@ -98,7 +98,7 @@ public class WebSocketService : IWebSocketService
         var jsonString = Encoding.UTF8.GetString(buffer);
 
         var message = JsonSerializer.Deserialize<Message>(jsonString);
-        var stringMessage = message!.Mode == "0" ? message.GetRgbMessage() : message.GetArgumentsMessage();
+        var stringMessage = message!.Mode == "0" ? message.GetRgbwMessage() : message.GetArgumentsMessage();
 
         return Encoding.UTF8.GetBytes(stringMessage);
     }
