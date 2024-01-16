@@ -31,10 +31,13 @@ public class WebSocketService : IWebSocketService
             var clientSocket = Sockets.FirstOrDefault(w => w.Id == client.Socket.Id);
             var receiverClients = clientSocket!.Clients.Where(w => w.Client.Roles!.Any(w => w == "receiver"));
 
-            await client.WebSocket.SendAsync(clientSocket.Data,
-                                          WebSocketMessageType.Text,
-                                          true,
-                                          cancellationToken);
+            if (client.Client.Roles?.Contains("sender") ?? true)
+            {
+                await client.WebSocket.SendAsync(clientSocket.Data,
+                                              WebSocketMessageType.Text,
+                                              true,
+                                              cancellationToken);
+            }
 
             while (client.WebSocket.State != WebSocketState.Closed && client.WebSocket.State != WebSocketState.Aborted && !cancellationToken.IsCancellationRequested)
             {
