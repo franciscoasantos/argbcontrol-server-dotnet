@@ -1,0 +1,76 @@
+name: Deploy Api
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    env:
+      APP_NAME: ${{ vars.APP_NAME }}
+      APP_DIRECTORY: ${{ vars.INSTALLATION_DIR }}/${{ vars.APP_NAME }}
+      DLL_NAME: Api.dll
+      CSPROJ_FILE: src/Api/Api.csproj
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Create Directory
+        run: mkdir -p ${{ env.APP_DIRECTORY }}
+
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v1.7.2
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Install Dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build ${{ env.CSPROJ_FILE }} --configuration Release --no-restore
+
+      - name: Publish
+        run: dotnet publish ${{ env.CSPROJ_FILE }} -c Release -o ${{ env.APP_DIRECTORY }}
+
+      - name: App Settings Variable Substitution
+        uses: qetza/replacetokens-action@v1.1.2
+        with:
+          sources: '${{ env.APP_DIRECTORY }}/appsettings.Production.json'
+          variables: '[${{ toJSON(vars) }},${{ toJSON(secrets) }}]'
+
+      - name: Remove escaped quotes from JSON
+        run: sed -i 's/\\"/"/g' ${{ env.APP_DIRECTORY }}/appsettings.Production.json
+
+      - name: Create services directory
+        run: mkdir -p ~/.config/systemd/user/
+
+      - name: Create systemd service file
+        run: |
+          echo "[Unit]
+          Description=ArgbControl Server
+
+          [Service]
+          WorkingDirectory=${{ env.APP_DIRECTORY }}
+          ExecStart=/usr/bin/dotnet ${{ env.APP_DIRECTORY }}/${{ env.DLL_NAME }} --urls "${{ vars.API_URLS }}"
+          Restart=always
+          RestartSec=10
+          KillSignal=SIGINT
+          SyslogIdentifier=${{ env.APP_NAME }}
+          Environment=ASPNETCORE_ENVIRONMENT=Production
+          Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+
+          [Install]
+          WantedBy=default.target" > ~/.config/systemd/user/${{ env.APP_NAME }}.service
+
+      - name: Start Service
+        run: |
+          export XDG_RUNTIME_DIR=/run/user/$(id -u)
+          systemctl --user daemon-reload
+          systemctl --user enable ${{ env.APP_NAME }}.service
+          systemctl --user restart ${{ env.APP_NAME }}.service
