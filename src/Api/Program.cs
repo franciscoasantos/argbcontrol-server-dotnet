@@ -13,6 +13,17 @@ builder.Services.AddMongoDb(builder.Configuration);
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
+// Permitir qualquer origem e qualquer método (CORS liberado)
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
 builder.Configuration
     .SetBasePath(builder.Environment.ContentRootPath)
     .AddJsonFile("appsettings.json", false, true)
@@ -39,6 +50,9 @@ app.Use(async (context, next) =>
 
     await next.Invoke();
 });
+
+// Ativar CORS antes de autenticação
+app.UseCors();
 
 app.UseAuthentication();
 app.UseAuthorization();
