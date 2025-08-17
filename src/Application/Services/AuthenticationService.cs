@@ -13,7 +13,7 @@ public class AuthenticationService(IClientsRepository clientsRepository,
 {
     private const string CachePrefix = "AuthenticateService:";
 
-    public async Task<WebSocketAuthInfo> Authenticate(string id, string secret)
+    public async Task<WebSocketAuthInfo> AuthenticateAsync(string id, string secret)
     {
         var client = await clientsRepository.GetAsync(id);
 
@@ -29,12 +29,12 @@ public class AuthenticationService(IClientsRepository clientsRepository,
             return default!;
         }
 
-        var jwt = tokenService.Generate(new Client(id.ToString(), secret, client.Roles!));
+        var tokenInfo = tokenService.Generate(new Client(id.ToString(), secret, client.Roles!));
 
         return cache.GetOrCreate(CachePrefix + id, item =>
         {
-            item.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
-            return new WebSocketAuthInfo(socket, client, jwt);
+            item.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(tokenInfo.ExpiresIn);
+            return new WebSocketAuthInfo(socket, client, tokenInfo);
         })!;
     }
 

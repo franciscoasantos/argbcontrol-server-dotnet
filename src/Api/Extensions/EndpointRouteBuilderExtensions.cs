@@ -1,4 +1,5 @@
-﻿using Application.Contracts;
+﻿using Api.Contracts.Request;
+using Application.Contracts;
 using Application.DataContracts;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,21 +9,23 @@ public static class EndpointRouteBuilderExtensions
 {
     public static void MapAuthEndpoints(this IEndpointRouteBuilder builder)
     {
-        builder.MapGet("api/token", async ([FromServices] IAuthenticationService authenticationService,
-                                           [FromHeader(Name = "X-Client-Id")] string id,
-                                           [FromHeader(Name = "X-Client-Secret")] string secret) =>
+        builder.MapPost("api/token", async ([FromServices] IAuthenticationService service,
+                                            [FromBody] TokenRequest request) =>
         {
-            var authInfo = await authenticationService.Authenticate(id, secret);
+            var authInfo = await service.AuthenticateAsync(request.Id, request.Secret);
 
-            return authInfo is null
-                ? Results.Unauthorized()
-                : Results.Text(authInfo.Token, statusCode: StatusCodes.Status200OK);
+            if (authInfo is null)
+            {
+                return Results.Unauthorized();
+            }
+
+            return Results.Json(authInfo.Token, statusCode: StatusCodes.Status200OK);
         });
     }
 
     public static void MapWebSocketEndpoints(this IEndpointRouteBuilder builder)
     {
-        builder.Map("/", async ([FromServices] IAuthenticationService authenticationService,
+        builder.Map("/", async ([FromServices] IAuthenticationService authService,
                                 [FromServices] IWebSocketService webSocketService,
                                 [FromQuery(Name = "client_id")] string id,
                                 HttpContext httpContext,
@@ -34,7 +37,7 @@ public static class EndpointRouteBuilderExtensions
                 return;
             }
 
-            if (authenticationService.TryGetAuthInfoFromCache(id, out WebSocketAuthInfo authInfo) is false)
+            if (authService.TryGetAuthInfoFromCache(id, out WebSocketAuthInfo authInfo) is false)
             {
                 httpContext.Response.StatusCode = StatusCodes.Status401Unauthorized;
                 return;
@@ -42,9 +45,7 @@ public static class EndpointRouteBuilderExtensions
 
             var wsContext = await httpContext.WebSockets.AcceptWebSocketAsync(subProtocol: null);
 
-            var webSocketClient = new WebSocketClient(wsContext,
-                                                      authInfo.Socket,
-                                                      authInfo.Client);
+            var webSocketClient = new WebSocketClient(wsContext, authInfo.Socket, authInfo.Client);
 
             await webSocketService.StartProcessingAsync(webSocketClient, cancellationToken);
         }).RequireAuthorization("websocket");

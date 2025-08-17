@@ -4,5 +4,5 @@ namespace Application.Contracts;
 
 public interface ITokenService
 {
-    string Generate(Client client);
+    TokenInfo Generate(Client client);
 }

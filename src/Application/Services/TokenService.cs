@@ -10,7 +10,9 @@ namespace Application.Services;
 
 public class TokenService(IConfiguration configuration) : ITokenService
 {
-    public string Generate(Client client)
+    private const int ExpirationMinutes = 5;
+
+    public TokenInfo Generate(Client client)
     {
         var handler = new JwtSecurityTokenHandler();
 
@@ -18,16 +20,25 @@ public class TokenService(IConfiguration configuration) : ITokenService
 
         var credentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature);
 
+        var expiration = DateTime.UtcNow.AddMinutes(ExpirationMinutes);
+
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = GetClaimsIdentity(client),
             SigningCredentials = credentials,
-            Expires = DateTime.UtcNow.AddMinutes(5),
+            Expires = expiration,
         };
 
         var token = handler.CreateToken(tokenDescriptor);
+        var tokenStr = handler.WriteToken(token);
 
-        return handler.WriteToken(token);
+        var expiresIn = (int)(expiration - DateTime.UtcNow).TotalSeconds;
+
+        return new TokenInfo
+        {
+            Token = tokenStr,
+            ExpiresIn = expiresIn
+        };
     }
 
     private static ClaimsIdentity GetClaimsIdentity(Client client)
