@@ -1,0 +1,126 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'src/**'
+      - 'tests/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+#    - name: Test
+#      run: dotnet test --verbosity normal
+  deploy:
+    runs-on: self-hosted
+    needs: [build, test]
+    env:
+      APP_NAME: ${{ vars.APP_NAME }}
+      APP_DIRECTORY: ${{ vars.INSTALLATION_DIR }}/${{ vars.APP_NAME }}
+      EXECUTABLE_NAME: ${{ vars.EXECUTABLE_NAME }}
+      CSPROJ_FILE: src/Api/Api.csproj
+      ASPNETCORE_ENVIRONMENT: Production
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Create Directory
+        run: mkdir -p ${{ env.APP_DIRECTORY }}
+
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v1.7.2
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install Dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build ${{ env.CSPROJ_FILE }} --configuration Release --no-restore
+
+      - name: Publish
+        run: dotnet publish ${{ env.CSPROJ_FILE }} -c Release -o ${{ env.APP_DIRECTORY }} --self-contained
+
+      - name: App Settings Variable Substitution
+        uses: qetza/replacetokens-action@v1.1.2
+        with:
+          sources: '${{ env.APP_DIRECTORY }}/appsettings.${{ env.ASPNETCORE_ENVIRONMENT }}.json'
+          variables: '[${{ toJSON(vars) }},${{ toJSON(secrets) }}]'
+
+      - name: Remove escaped quotes from JSON
+        run: sed -i 's/\\"/"/g' ${{ env.APP_DIRECTORY }}/appsettings.${{ env.ASPNETCORE_ENVIRONMENT }}.json
+
+      - name: Create services directory
+        run: mkdir -p ~/.config/systemd/user/
+
+      - name: Create systemd service file
+        run: |
+          echo "[Unit]
+          Description=Ecommerce Api
+
+          [Service]
+          WorkingDirectory=${{ env.APP_DIRECTORY }}
+          ExecStart=${{ env.APP_DIRECTORY }}/${{ env.EXECUTABLE_NAME }} --urls http://*:5000/
+          Restart=always
+          RestartSec=10
+          KillSignal=SIGINT
+          SyslogIdentifier=${{ env.APP_NAME }}
+          Environment=ASPNETCORE_ENVIRONMENT=${{ env.ASPNETCORE_ENVIRONMENT }}
+          Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+
+          [Install]
+          WantedBy=default.target" > ~/.config/systemd/user/${{ env.APP_NAME }}.service
+
+      - name: Stop Service
+        continue-on-error: true
+        run: |
+          export XDG_RUNTIME_DIR=/run/user/$(id -u)
+          systemctl --user stop ${{ env.APP_NAME }}.service
+
+      - name: Start Service
+        run: |
+          export XDG_RUNTIME_DIR=/run/user/$(id -u)
+          systemctl --user daemon-reload
+          systemctl --user enable ${{ env.APP_NAME }}.service
+          systemctl --user restart ${{ env.APP_NAME }}.service

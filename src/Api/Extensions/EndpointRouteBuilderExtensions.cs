@@ -1,9 +1,9 @@
-﻿using Api.Contracts.Request;
-using Application.Contracts;
-using Application.DataContracts;
+﻿using ArgbControl.Api.Application.Contracts;
+using ArgbControl.Api.Application.DataContracts;
+using ArgbControl.Api.Contracts.Request;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Api.Extensions;
+namespace ArgbControl.Api.Extensions;
 
 public static class EndpointRouteBuilderExtensions
 {

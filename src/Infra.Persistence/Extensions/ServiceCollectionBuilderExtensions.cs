@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace Infra.Persistence.Extensions;
+namespace ArgbControl.Api.Infrastructure.Persistence.Extensions;
 
 public static class ServiceCollectionBuilderExtensions
 {

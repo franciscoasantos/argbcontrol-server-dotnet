@@ -1,8 +1,8 @@
-﻿using Application.Contracts;
-using Application.Services;
+﻿using ArgbControl.Api.Application.Contracts;
+using ArgbControl.Api.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Application.Extensions;
+namespace ArgbControl.Api.Application.Extensions;
 
 public static class ServiceCollectionBuilderExtensions
 {

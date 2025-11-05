@@ -1,6 +1,6 @@
-﻿using Application.DataContracts;
+﻿using ArgbControl.Api.Application.DataContracts;
 
-namespace Application.Contracts;
+namespace ArgbControl.Api.Application.Contracts;
 
 public interface IAuthenticationService
 {

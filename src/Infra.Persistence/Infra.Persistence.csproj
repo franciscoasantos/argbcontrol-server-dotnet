@@ -4,6 +4,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <AssemblyName>ArgbControl.Api.Infrastructure.Persistence</AssemblyName>
+    <RootNamespace>ArgbControl.Api.Infrastructure.Persistence</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,6 +1,6 @@
-﻿using Application.DataContracts;
+﻿using ArgbControl.Api.Application.DataContracts;
 
-namespace Application.Extensions;
+namespace ArgbControl.Api.Application.Extensions;
 
 public static class ListExtensions
 {

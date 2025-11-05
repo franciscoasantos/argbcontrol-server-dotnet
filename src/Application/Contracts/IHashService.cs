@@ -1,4 +1,4 @@
-﻿namespace Application.Contracts;
+﻿namespace ArgbControl.Api.Application.Contracts;
 
 public interface IHashService
 {

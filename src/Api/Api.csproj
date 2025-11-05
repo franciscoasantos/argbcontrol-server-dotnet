@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>c6ab5958-0a85-44de-8d61-8c334ed3e113</UserSecretsId>
+    <AssemblyName>ArgbControl.Api</AssemblyName>
+    <RootNamespace>ArgbControl.Api</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

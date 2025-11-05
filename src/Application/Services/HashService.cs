@@ -1,8 +1,8 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
-using Application.Contracts;
+using ArgbControl.Api.Application.Contracts;
 
-namespace Application.Services;
+namespace ArgbControl.Api.Application.Services;
 
 public class HashService : IHashService
 {

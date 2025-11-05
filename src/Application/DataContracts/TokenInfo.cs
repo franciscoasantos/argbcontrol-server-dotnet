@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Application.DataContracts;
+namespace ArgbControl.Api.Application.DataContracts;
 
 public class TokenInfo
 {

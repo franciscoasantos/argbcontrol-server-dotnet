@@ -1,9 +1,9 @@
-﻿using Application.Contracts;
-using Application.DataContracts;
-using Infra.Persistence;
+﻿using ArgbControl.Api.Application.Contracts;
+using ArgbControl.Api.Application.DataContracts;
+using ArgbControl.Api.Infrastructure.Persistence;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace Application.Services;
+namespace ArgbControl.Api.Application.Services;
 
 public class AuthenticationService(IClientsRepository clientsRepository,
                                    ISocketsRepository socketsRepository,

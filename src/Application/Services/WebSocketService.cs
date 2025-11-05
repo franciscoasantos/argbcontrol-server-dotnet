@@ -1,11 +1,11 @@
-﻿using Application.Contracts;
-using Application.DataContracts;
-using Application.Extensions;
+﻿using ArgbControl.Api.Application.Contracts;
+using ArgbControl.Api.Application.DataContracts;
+using ArgbControl.Api.Application.Extensions;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
 
-namespace Application.Services;
+namespace ArgbControl.Api.Application.Services;
 
 public class WebSocketService : IWebSocketService
 {

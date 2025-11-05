@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Api.Contracts.Response;
+namespace ArgbControl.Api.Contracts.Response;
 
 public class TokenResponse
 {

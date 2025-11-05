@@ -1,4 +1,4 @@
-﻿namespace Infra.Persistence.Settings;
+﻿namespace ArgbControl.Api.Infrastructure.Persistence.Settings;
 
 public class MongoSettings
 {

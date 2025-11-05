@@ -1,7 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Infra.Persistence.Models;
+namespace ArgbControl.Api.Infrastructure.Persistence.Models;
 
 public class Client
 {

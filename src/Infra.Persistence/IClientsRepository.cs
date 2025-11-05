@@ -1,6 +1,6 @@
-﻿using Infra.Persistence.Models;
+﻿using ArgbControl.Api.Infrastructure.Persistence.Models;
 
-namespace Infra.Persistence;
+namespace ArgbControl.Api.Infrastructure.Persistence;
 
 public interface IClientsRepository
 {

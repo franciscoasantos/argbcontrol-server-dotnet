@@ -1,4 +1,4 @@
-﻿namespace Application.DataContracts;
+﻿namespace ArgbControl.Api.Application.DataContracts;
 
 public class WebSocketInstance
 {

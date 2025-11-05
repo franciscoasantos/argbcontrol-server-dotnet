@@ -1,10 +1,10 @@
-﻿using Infra.Persistence.Models;
+﻿using ArgbControl.Api.Infrastructure.Persistence.Models;
 
-namespace Application.DataContracts;
+namespace ArgbControl.Api.Application.DataContracts;
 
-public class WebSocketAuthInfo(Socket socket, Infra.Persistence.Models.Client client, TokenInfo token)
+public class WebSocketAuthInfo(Socket socket, Infrastructure.Persistence.Models.Client client, TokenInfo token)
 {
     public Socket Socket { get; set; } = socket;
-    public Infra.Persistence.Models.Client Client { get; set; } = client;
+    public Infrastructure.Persistence.Models.Client Client { get; set; } = client;
     public TokenInfo Token { get; set; } = token;
 }

@@ -1,11 +1,11 @@
-﻿using Application.Extensions;
-using Infra.Persistence.Extensions;
-using Infra.Persistence.Settings;
+﻿using ArgbControl.Api.Application.Extensions;
+using ArgbControl.Api.Infrastructure.Persistence.Extensions;
+using ArgbControl.Api.Infrastructure.Persistence.Settings;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-namespace Api.Extensions;
+namespace ArgbControl.Api.Extensions;
 
 public static class ServiceCollectionBuilderExtensions
 {

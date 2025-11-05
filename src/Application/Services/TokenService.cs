@@ -1,12 +1,12 @@
-﻿using Application.Contracts;
-using Application.DataContracts;
+﻿using ArgbControl.Api.Application.Contracts;
+using ArgbControl.Api.Application.DataContracts;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace Application.Services;
+namespace ArgbControl.Api.Application.Services;
 
 public class TokenService(IConfiguration configuration) : ITokenService
 {

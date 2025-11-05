@@ -1,9 +1,9 @@
-﻿using Infra.Persistence.Models;
-using Infra.Persistence.Settings;
+﻿using ArgbControl.Api.Infrastructure.Persistence.Models;
+using ArgbControl.Api.Infrastructure.Persistence.Settings;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
-namespace Infra.Persistence;
+namespace ArgbControl.Api.Infrastructure.Persistence;
 
 public class SocketsRepository : ISocketsRepository
 {
