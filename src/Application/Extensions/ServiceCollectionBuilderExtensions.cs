@@ -10,6 +10,9 @@ public static class ServiceCollectionBuilderExtensions
     {
         services.AddScoped<IAuthenticationService, AuthenticationService>();
         services.AddSingleton<IWebSocketService, WebSocketService>();
+        services.AddSingleton<IWebSocketConnectionManager, WebSocketConnectionManager>();
+        services.AddSingleton<IWebSocketMessageHandler, WebSocketMessageHandler>();
+        services.AddSingleton<IMessageParser, MessageParser>();
         services.AddSingleton<IHashService, HashService>();
         services.AddTransient<ITokenService, TokenService>();
     }

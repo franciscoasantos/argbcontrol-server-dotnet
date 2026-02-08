@@ -1,23 +1,32 @@
-﻿using ArgbControl.Api.Application.Contracts;
+﻿using ArgbControl.Api.Application.Constants;
+using ArgbControl.Api.Application.Contracts;
 using ArgbControl.Api.Application.DataContracts;
 using ArgbControl.Api.Infrastructure.Persistence;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace ArgbControl.Api.Application.Services;
 
-public class AuthenticationService(IClientsRepository clientsRepository,
-                                   ISocketsRepository socketsRepository,
-                                   IHashService hashService,
-                                   ITokenService tokenService,
-                                   IMemoryCache cache) : IAuthenticationService
+public sealed class AuthenticationService(IClientsRepository clientsRepository,
+                                          ISocketsRepository socketsRepository,
+                                          IHashService hashService,
+                                          ITokenService tokenService,
+                                          IMemoryCache cache) : IAuthenticationService
 {
-    private const string CachePrefix = "AuthenticateService:";
-
     public async Task<WebSocketAuthInfo> AuthenticateAsync(string id, string secret)
     {
+        if (string.IsNullOrWhiteSpace(id))
+        {
+            throw new ArgumentException("Client ID cannot be null or empty", nameof(id));
+        }
+
+        if (string.IsNullOrWhiteSpace(secret))
+        {
+            throw new ArgumentException("Secret cannot be null or empty", nameof(secret));
+        }
+
         var client = await clientsRepository.GetAsync(id);
 
-        if (client is null || hashService.IsValidHash(secret, client.SecretHash!) is false)
+        if (client is null || !hashService.IsValidHash(secret, client.SecretHash!))
         {
             return default!;
         }
@@ -29,15 +38,23 @@ public class AuthenticationService(IClientsRepository clientsRepository,
             return default!;
         }
 
-        var tokenInfo = tokenService.Generate(new Client(id.ToString(), secret, client.Roles!));
+        var tokenInfo = tokenService.Generate(new Client(id, secret, client.Roles!));
 
-        return cache.GetOrCreate(CachePrefix + id, item =>
+        return cache.GetOrCreate(CacheKeys.GetAuthenticationKey(id), entry =>
         {
-            item.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(tokenInfo.ExpiresIn);
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(tokenInfo.ExpiresIn);
             return new WebSocketAuthInfo(socket, client, tokenInfo);
         })!;
     }
 
     public bool TryGetAuthInfoFromCache(string id, out WebSocketAuthInfo authInfo)
-        => cache.TryGetValue(CachePrefix + id, out authInfo!);
+    {
+        if (string.IsNullOrWhiteSpace(id))
+        {
+            authInfo = default!;
+            return false;
+        }
+
+        return cache.TryGetValue(CacheKeys.GetAuthenticationKey(id), out authInfo!);
+    }
 }

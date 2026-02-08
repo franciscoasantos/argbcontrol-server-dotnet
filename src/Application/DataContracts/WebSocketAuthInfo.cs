@@ -2,9 +2,9 @@
 
 namespace ArgbControl.Api.Application.DataContracts;
 
-public class WebSocketAuthInfo(Socket socket, Infrastructure.Persistence.Models.Client client, TokenInfo token)
+public sealed class WebSocketAuthInfo(Socket socket, Infrastructure.Persistence.Models.Client client, TokenInfo token)
 {
-    public Socket Socket { get; set; } = socket;
-    public Infrastructure.Persistence.Models.Client Client { get; set; } = client;
-    public TokenInfo Token { get; set; } = token;
+    public Socket Socket { get; } = socket ?? throw new ArgumentNullException(nameof(socket));
+    public Infrastructure.Persistence.Models.Client Client { get; } = client ?? throw new ArgumentNullException(nameof(client));
+    public TokenInfo Token { get; } = token ?? throw new ArgumentNullException(nameof(token));
 }
