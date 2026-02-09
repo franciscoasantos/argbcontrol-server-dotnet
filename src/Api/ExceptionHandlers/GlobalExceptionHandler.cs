@@ -3,11 +3,11 @@ using System.Net;
 
 namespace ArgbControl.Api.ExceptionHandlers;
 
-public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> _logger) : IExceptionHandler
+public class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger) : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
-        _logger.LogError(exception, "An unexpected error occurred");
+        logger.LogError(exception, "An unexpected error occurred");
 
         await Results.Problem(new()
         {
